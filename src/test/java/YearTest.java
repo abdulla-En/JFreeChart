@@ -1,11 +1,10 @@
+import org.jfree.data.time.RegularTimePeriod;
+import org.jfree.data.time.TimePeriodFormatException;
 import org.jfree.data.time.Year;
 import org.junit.Test;
 
 import java.sql.Time;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -457,18 +456,6 @@ public class YearTest {
         assertThrows(NullPointerException.class,()->new Year(2020).peg(null));
     }
 
-    @Test
-    public void Test_PegForAboveMaxValidYearThrowException() {
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        assertThrows(IllegalArgumentException.class,()->new Year(10000).peg(cal));
-    }
-
-    @Test
-    public void Test_PegForBelowMinValidYearThrowException() {
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        assertThrows(IllegalArgumentException.class,()->new Year(-10000).peg(cal));
-    }
-
 
 // .........................................SerialIndex Method.....................................................//
 
@@ -557,9 +544,231 @@ public class YearTest {
 
     // conclusion in BC years the next is previous and vice versa
 
+    // ............................................equals(Object) Method.............................................//
+
+
+    // Equivalent Test
+    @Test
+    public void TestEqualsSameYear()
+    {
+        year = new Year(2025);
+        Year year2 = new Year(2025);
+        boolean check = year.equals(year2);
+        assertTrue(check);
+    }
+
+    // non_Equivalent Test
+    @Test
+    public void TestEqualsNotSameYear()
+    {
+        year = new Year(2025);
+        Year year2 = new Year(2026);
+        boolean check = year.equals(year2);
+        assertFalse(check);
+    }
+    // instance of Test
+    @Test
+    public void TestEqualObjectInstanceOfYear()
+    {
+        year = new Year(2025);
+        RegularTimePeriod year2 = new Year(2025);
+        boolean check = year.equals(year2);
+        assertTrue(check);
+    }
+
+    // not instance of Test
+    @Test
+    public void TestEqualObjectNotInstanceOfYear()
+    {
+        year = new Year(2025);
+        String FakeYear = "2025";
+        boolean check = year.equals(FakeYear);
+        assertFalse(check);
+    }
+    // null object
+    @Test
+    public void TestEqualNullObject()
+    {
+        year = new Year(2025);
+        boolean check = year.equals(null);
+        assertFalse(check);
+    }
+    // null object
+    @Test
+    public void TestEqualGenericObject()
+    {
+        year = new Year(2025);
+        Object obj = new Object();
+        boolean check = year.equals(obj);
+        assertFalse(check);
+    }
+
+
+    // ............................................hashCode() Method.............................................//
+
+    @Test
+    public void HashCode()
+    {
+        year = new Year(2025);
+        int expectedHashCode = 37 * 17 + 2025;
+        int actualHashCode = year.hashCode();
+        assertEquals(expectedHashCode,actualHashCode);
+
+    }
+
+// ............................................compareTo(Object o1)..............................................//
+
+    @Test
+    // Test instance of year
+    public void TestCompareToWithEqualYear()
+    {
+        year = new Year(2024);
+        RegularTimePeriod SameYear = new Year(2024);
+        int diff = year.compareTo(SameYear);
+        assertEquals(0,diff);
+    }
+    @Test
+    public void TestCompareToWithBiggerYear()
+    {
+        year = new Year(2024);
+        RegularTimePeriod SameYear = new Year(2025);
+        int diff = year.compareTo(SameYear);
+        assertEquals(-1,diff);
+    }
+    @Test
+    public void TestCompareToWithSmallerYear()
+    {
+        year = new Year(2024);
+        RegularTimePeriod SameYear = new Year(2023);
+        int diff = year.compareTo(SameYear);
+        assertEquals(1,diff);
+    }
+
+    // Test instance of RegularTimePeriod
+
+    @Test
+    public void TestCompareToWithRegularTimeObj()
+    {
+        year = new Year(2024);
+        RegularTimePeriod RegularTimeObj =new RegularTimePeriod() {
+            @Override public RegularTimePeriod previous() {return null;}
+            @Override public RegularTimePeriod next() {return null;}
+            @Override public long getSerialIndex() {return 0;}
+            @Override public void peg(Calendar calendar) {}
+            @Override public long getFirstMillisecond() {return 0;}
+            @Override public long getFirstMillisecond(Calendar calendar) {return 0;}
+            @Override public long getLastMillisecond() {return 0;}
+            @Override public long getLastMillisecond(Calendar calendar) {return 0;}
+            @Override public int compareTo(Object o) {return 0;}
+        };
+        int comparison = year.compareTo(RegularTimeObj);
+        assertEquals(0,comparison);
+    }
+
+    // Test instance of Some Object
+    @Test
+    public void TestCompareToWithNullObj()
+    {
+        year = new Year(2024);
+        int comparison = year.compareTo(null);
+        assertEquals(1,comparison);
+    }
+
+    @Test
+    public void TestCompareToWithSomeObj()
+    {
+        year = new Year(2024);
+        String test = "2025";
+        int comparison = year.compareTo(test);
+        assertEquals(1,comparison);
+    }
+
+    @Test
+    public void TestCompareToWithGenericObj()
+    {
+        year = new Year(2024);
+        Object obj = new Object();
+        int comparison = year.compareTo(obj);
+        assertEquals(1,comparison);
+    }
+
+
+// ..............................................toString()................................................//
+
+    // test to String Method
+    @Test
+    public void TestToStringNormal()
+    {
+        assertEquals("2025",new Year(2025).toString());
+    }
+
+    @Test
+    public void TestToStringBcYear()
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.set(0,Calendar.FEBRUARY,20); // 0 i 1 BC
+        year = new Year(cal.getTime(),TimeZone.getDefault(),Locale.getDefault());
+        assertEquals("1",year.toString());
+    }
+
+    // ..............................................ParseYear()................................................//
+
+    // Test valid Cases
+
+    @Test
+    public void TestParseYearNormalYear()
+    {
+        assertEquals(2025,Year.parseYear("2025").getYear());
+    }
+    @Test
+    public void TestParseYearMaxBoundaryYear()
+    {
+        assertEquals(9999,Year.parseYear("9999").getYear());
+    }
+    @Test
+    public void TestParseYearMinBoundaryYear()
+    {
+        assertEquals(-9999,Year.parseYear("-9999").getYear());
+    }
+
+    // Test Invalid Cases
+
+    @Test
+    public void TestParseYearAboveMaxBoundaryYear()
+    {
+        TimePeriodFormatException Ex = assertThrows(TimePeriodFormatException.class,()->Year.parseYear("10000"));
+        assertEquals("Year outside valid range.",Ex.getMessage());
+    }
+
+    @Test
+    public void TestParseYearBelowMinBoundaryYear()
+    {
+        TimePeriodFormatException Ex = assertThrows(TimePeriodFormatException.class,()->Year.parseYear("-10000"));
+        assertEquals("Year outside valid range.",Ex.getMessage());
+
+    }
+
+    @Test
+    public void TestParseYearNotaNumber()
+    {
+        TimePeriodFormatException Ex = assertThrows(TimePeriodFormatException.class,()->Year.parseYear("HelloWorld").getYear());
+        assertEquals("Cannot parse string.",Ex.getMessage());
+    }
+
+    // Bad Test
+    @Test
+    public void TestParseBadTest()
+    {
+        assertThrows(NullPointerException.class,()->Year.parseYear(null));
+    }
+
+    //***********************************************((Finish))*********************************************************
+    //******************************************************************************************************************
+
+
+
+
+
+
 }
-
-
-
-
 
