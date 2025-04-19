@@ -71,7 +71,7 @@ public class DiscountManagerTest {
         // Arrange
         boolean isDiscountsSeason = true;
         double originalPrice = 150.0;
-        double expectedPrice = originalPrice * 7; // ازاي خصم بيضرب السعر في سبعه؟
+        double expectedPrice = originalPrice * 0.93;
 
         Mockery mockingContext = new Mockery();
         IDiscountCalculator mockedDependency = mockingContext.mock(IDiscountCalculator.class);
@@ -102,7 +102,7 @@ public class DiscountManagerTest {
         // Arrange
         boolean isDiscountsSeason = true;
         double originalPrice = 120.0;
-        double expectedPrice = originalPrice * 5; // ؟؟
+        double expectedPrice = originalPrice * 0.95;
 
         Mockery mockingContext = new Mockery();
         IDiscountCalculator mockedDependency = mockingContext.mock(IDiscountCalculator.class);
