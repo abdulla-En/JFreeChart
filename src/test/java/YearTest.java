@@ -2,12 +2,8 @@ import org.jfree.data.time.RegularTimePeriod;
 import org.jfree.data.time.TimePeriodFormatException;
 import org.jfree.data.time.Year;
 import org.junit.Test;
-
-import java.sql.Time;
 import java.util.*;
-
 import static org.junit.Assert.*;
-
 
 public class YearTest {
     Year year;
@@ -763,7 +759,7 @@ public class YearTest {
     }
 
     //***********************************************((Finish))*********************************************************
-    //******************************************************************************************************************
+    //*****************************************************************************************************************
 
 
 
